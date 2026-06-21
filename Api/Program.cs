@@ -21,7 +21,7 @@ const string CorsPolicy = "RifaFrontend";
 
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>() ?? ["https://rifa-bll7.onrender.com"];
+    .Get<string[]>() ?? ["https://rifa-ui.vercel.app"];
 
 builder.Services.AddCors(options =>
 {
