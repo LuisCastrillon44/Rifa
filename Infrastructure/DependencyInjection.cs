@@ -13,6 +13,9 @@ public static class DependencyInjection
     /// <summary>Variable de entorno que, si esta definida, tiene prioridad sobre appsettings.</summary>
     public const string ConnectionStringEnvVar = "RIFA_DB_CONNECTION";
 
+    /// <summary>Variable de entorno plana para la clave JWT; tiene prioridad sobre 'Jwt:Key'.</summary>
+    public const string JwtKeyEnvVar = "JWT_KEY";
+
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         // Prioridad: variable de entorno RIFA_DB_CONNECTION > ConnectionStrings:RifaDb (appsettings o ConnectionStrings__RifaDb).
@@ -31,6 +34,12 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString));
 
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+
+        // Si existe la variable de entorno plana JWT_KEY, tiene prioridad sobre 'Jwt:Key'
+        // para que la clave de firma sea la misma que valida la Api en Render.
+        var jwtKey = Environment.GetEnvironmentVariable(JwtKeyEnvVar);
+        if (!string.IsNullOrWhiteSpace(jwtKey))
+            services.PostConfigure<JwtSettings>(settings => settings.Key = jwtKey);
 
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();

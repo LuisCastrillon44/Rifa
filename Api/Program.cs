@@ -31,8 +31,15 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
-// Autenticacion JWT. La clave puede sobrescribirse con la variable de entorno Jwt__Key.
+// Autenticacion JWT. La clave puede definirse de dos formas (en este orden de prioridad):
+//   1. Variable de entorno plana JWT_KEY (recomendado en Render).
+//   2. Configuracion Jwt:Key (appsettings o variable Jwt__Key con doble guion bajo).
 var jwtSection = builder.Configuration.GetSection("Jwt");
+var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
+    ?? jwtSection["Key"]
+    ?? throw new InvalidOperationException(
+        "Falta la clave JWT. Defina la variable de entorno 'JWT_KEY' o la clave 'Jwt:Key' en la configuracion.");
+
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -45,9 +52,7 @@ builder.Services
             ValidateIssuerSigningKey = true,
             ValidIssuer = jwtSection["Issuer"],
             ValidAudience = jwtSection["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSection["Key"]
-                    ?? throw new InvalidOperationException("Falta la clave 'Jwt:Key' en la configuracion.")))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
