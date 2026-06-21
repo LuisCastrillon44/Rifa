@@ -9,7 +9,7 @@ public record TalonarioDto(
     decimal BoletasValue,
     DateTime LotteryDate,
     string? LotteryNumber,
-    decimal Jackpot);
+    string Jackpot);
 
 public record CreateTalonarioDto(
     long UserId,
@@ -19,7 +19,7 @@ public record CreateTalonarioDto(
     decimal BoletasValue,
     DateTime LotteryDate,
     string? LotteryNumber,
-    decimal Jackpot);
+    string Jackpot);
 
 public record UpdateTalonarioDto(
     string Title,
@@ -28,4 +28,4 @@ public record UpdateTalonarioDto(
     decimal BoletasValue,
     DateTime LotteryDate,
     string? LotteryNumber,
-    decimal Jackpot);
+    string Jackpot);

@@ -7,7 +7,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-// [Authorize] // TODO: reactivar cuando el front tenga login (JWT ya esta implementado)
+[Authorize]
 public class UsuariosController : ControllerBase
 {
     private readonly IUsuarioService _service;

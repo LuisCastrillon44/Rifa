@@ -2,6 +2,7 @@ using Application.Common.Exceptions;
 using Application.DTOs.Talonarios;
 using Application.Mappings;
 using Application.Services.Interfaces;
+using Domain.Entities;
 using Domain.Interfaces;
 using FluentValidation;
 
@@ -54,6 +55,18 @@ public class TalonarioService : ITalonarioService
     {
         await _createValidator.ValidateAndThrowAsync(dto, ct);
         var entity = dto.ToEntity();
+
+        for (var number = 0; number < entity.BoletasNumber; number++)
+        {
+            entity.Boletas.Add(new Boleta
+            {
+                Number = number,
+                Sold = false
+                // BuyerName / BuyerPhone / BuyerAddress quedan null
+                // TalonarioId lo asigna EF por la relación de navegación
+            });
+        }
+
         await _repo.AddAsync(entity, ct);
         await _uow.SaveChangesAsync(ct);
         return entity.ToDto();

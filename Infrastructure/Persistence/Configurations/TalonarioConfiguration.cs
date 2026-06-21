@@ -20,7 +20,7 @@ public class TalonarioConfiguration : IEntityTypeConfiguration<Talonario>
         builder.Property(t => t.BoletasValue).HasColumnName("boletas_value").HasPrecision(18, 2);
         builder.Property(t => t.LotteryDate).HasColumnName("lottery_date");
         builder.Property(t => t.LotteryNumber).HasColumnName("lottery_number");
-        builder.Property(t => t.Jackpot).HasColumnName("jackpot").HasPrecision(18, 2);
+        builder.Property(t => t.Jackpot).HasColumnName("jackpot").HasMaxLength(255).IsRequired();
 
         builder.HasIndex(t => t.UserId);
 

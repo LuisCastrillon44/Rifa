@@ -7,7 +7,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-// [Authorize] // TODO: reactivar cuando el front tenga login (JWT ya esta implementado)
+[Authorize]
 public class BoletasController : ControllerBase
 {
     private readonly IBoletaService _service;

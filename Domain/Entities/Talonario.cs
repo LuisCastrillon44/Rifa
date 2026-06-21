@@ -11,7 +11,7 @@ public class Talonario : BaseEntity
     public decimal BoletasValue { get; set; }
     public DateTime LotteryDate { get; set; }
     public string? LotteryNumber { get; set; }
-    public decimal Jackpot { get; set; }
+    public string Jackpot { get; set; } = null!;
 
     public Usuario Usuario { get; set; } = null!;
     public ICollection<Boleta> Boletas { get; set; } = new List<Boleta>();

@@ -11,7 +11,7 @@ public class CreateTalonarioDtoValidator : AbstractValidator<CreateTalonarioDto>
         RuleFor(x => x.Title).NotEmpty().MaximumLength(255);
         RuleFor(x => x.BoletasNumber).GreaterThan(0);
         RuleFor(x => x.BoletasValue).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Jackpot).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Jackpot).NotEmpty().MaximumLength(255);
     }
 }
 
@@ -22,6 +22,6 @@ public class UpdateTalonarioDtoValidator : AbstractValidator<UpdateTalonarioDto>
         RuleFor(x => x.Title).NotEmpty().MaximumLength(255);
         RuleFor(x => x.BoletasNumber).GreaterThan(0);
         RuleFor(x => x.BoletasValue).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Jackpot).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Jackpot).NotEmpty().MaximumLength(255);
     }
 }
