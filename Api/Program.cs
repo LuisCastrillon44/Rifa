@@ -10,6 +10,11 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Render (y otros PaaS) inyectan el puerto a escuchar via la variable de entorno PORT.
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 const string CorsPolicy = "RifaFrontend";
 
 // Add services to the container.
@@ -61,13 +66,11 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var app = builder.Build();
 
-// En desarrollo, aplica automaticamente las migraciones pendientes al arrancar.
-// Asi, si borras las tablas (incluyendo __EFMigrationsHistory) o clonas el repo,
-// el esquema se recrea solo al ejecutar la app. En produccion conviene aplicarlas
-// de forma controlada con 'dotnet ef database update'.
-if (app.Environment.IsDevelopment())
+// Aplica automaticamente las migraciones pendientes al arrancar (idempotente).
+// Asi, si borras las tablas (incluyendo __EFMigrationsHistory), clonas el repo o
+// despliegas contra una BD nueva, el esquema se recrea solo al ejecutar la app.
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<RifaDbContext>();
     await db.Database.MigrateAsync();
 }
@@ -75,17 +78,16 @@ if (app.Environment.IsDevelopment())
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
-if (app.Environment.IsDevelopment())
+app.MapOpenApi();
+app.UseSwaggerUI(c =>
 {
-    app.MapOpenApi();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/openapi/v1.json", "Rifa API v1");
-        c.RoutePrefix = "swagger";
-    });
-}
+    c.SwaggerEndpoint("/openapi/v1.json", "Rifa API v1");
+    c.RoutePrefix = "swagger";
+});
 
-app.UseHttpsRedirection();
+// Tras el proxy TLS de Render la redireccion https no aplica y genera warnings.
+if (app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 
 app.UseCors(CorsPolicy);
 
@@ -93,5 +95,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapGet("/health", () => Results.Ok("OK"));
 
 app.Run();

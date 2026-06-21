@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: rifa-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Jwt__Key
+        sync: false            # secreto, minimo 32 bytes
+      - key: RIFA_DB_CONNECTION
+        sync: false            # opcional; si no se define usa la de appsettings.json
+      - key: Cors__AllowedOrigins__0
+        sync: false            # URL del frontend en produccion
