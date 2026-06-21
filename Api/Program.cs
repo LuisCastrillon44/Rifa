@@ -21,7 +21,7 @@ const string CorsPolicy = "RifaFrontend";
 
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>() ?? ["http://localhost:4200"];
+    .Get<string[]>() ?? ["https://rifa-bll7.onrender.com"];
 
 builder.Services.AddCors(options =>
 {
