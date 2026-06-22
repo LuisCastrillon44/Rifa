@@ -19,9 +19,13 @@ const string CorsPolicy = "RifaFrontend";
 
 // Add services to the container.
 
-var allowedOrigins = builder.Configuration
-    .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>() ?? ["https://rifa-ui.vercel.app"];
+var allowedOriginsSetting = builder.Configuration["Cors:AllowedOrigins"]
+    ?? "https://rifa-ui.vercel.app";
+
+var allowedOrigins = allowedOriginsSetting
+    .Split(';', StringSplitOptions.RemoveEmptyEntries)
+    .Select(o => o.Trim())
+    .ToArray();
 
 builder.Services.AddCors(options =>
 {
