@@ -81,6 +81,18 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
+
+// Tras el proxy TLS de Render la redireccion https no aplica y genera warnings.
+if (app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
+
+app.UseRouting();
+
+// CORS debe ir DESPUES de UseRouting y ANTES de UseExceptionHandler: si el manejador
+// de errores corre primero, al reescribir la respuesta (p.ej. un 401 de login) se pierden
+// los headers Access-Control-Allow-* y el navegador reporta un falso "CORS error".
+app.UseCors(CorsPolicy);
+
 app.UseExceptionHandler();
 
 app.MapOpenApi();
@@ -89,12 +101,6 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/openapi/v1.json", "Rifa API v1");
     c.RoutePrefix = "swagger";
 });
-
-// Tras el proxy TLS de Render la redireccion https no aplica y genera warnings.
-if (app.Environment.IsDevelopment())
-    app.UseHttpsRedirection();
-
-app.UseCors(CorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();
