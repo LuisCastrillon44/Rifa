@@ -19,18 +19,25 @@ const string CorsPolicy = "RifaFrontend";
 
 // Add services to the container.
 
-var allowedOriginsSetting = builder.Configuration["Cors:AllowedOrigins"]
-    ?? "https://rifa-ui.vercel.app";
-
-var allowedOrigins = allowedOriginsSetting
-    .Split(';', StringSplitOptions.RemoveEmptyEntries)
-    .Select(o => o.Trim())
-    .ToArray();
+// Origenes permitidos: se leen del array Cors:AllowedOrigins (en appsettings.json o como
+// variables Cors__AllowedOrigins__0, __1, ... en Render). Ademas, se permite cualquier
+// subdominio *.vercel.app y localhost, para no depender de las URLs cambiantes de Vercel.
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? [];
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(CorsPolicy, policy =>
-        policy.WithOrigins(allowedOrigins)
+        policy.SetIsOriginAllowed(origin =>
+            {
+                if (allowedOrigins.Contains(origin))
+                    return true;
+                if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+                    return false;
+                return uri.Host == "localhost"
+                    || uri.Host.EndsWith(".vercel.app", StringComparison.OrdinalIgnoreCase);
+            })
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
